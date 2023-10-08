@@ -26,11 +26,6 @@ function updateProgressBar() {
 
   // Mettez à jour le message de chargement
   loadingMessage.textContent = `Chargement : ${progress.toFixed(1)}%`;
-
-  // Si toutes les ressources sont chargées, masquez le composant de chargement
-  if (loadedResources === resourcesToLoad.length) {
-    loadingContainer.style.display = "none";
-  }
 }
 
 // Chargez chaque ressource et mettez à jour la barre de progression

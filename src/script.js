@@ -188,19 +188,12 @@ function simulateLoading() {
     updateLoadingProgress(progress);
 
     if (currentStep === totalSteps) {
-      // Toutes les étapes de chargement sont terminées
-      clearInterval(interval);
-
-      // Ajoutez une classe CSS pour masquer la barre de chargement
       loadingWrapper.classList.add("loading-complete");
-
-      // Attendre un court délai avant de charger la scène
       setTimeout(() => {
-        // Charger la scène et afficher
-        loadModels();
-      }, 500); // Délai en millisecondes avant de charger la scène
+        loadingWrapper.style.display = "none"
+      }, 200);
     }
-  }, 50); // Intervalle de mise à jour de la barre de chargement (en millisecondes)
+  }, 40); // Intervalle de mise à jour de la barre de chargement (en millisecondes)
 }
 
 
