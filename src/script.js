@@ -2,26 +2,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
-import * as dat from "lil-gui";
-import { lerp } from "three/src/math/MathUtils";
+
 
 THREE.ColorManagement.enabled = false;
-
-/**
- * Base
- */
-// Debug
-// const gui = new dat.GUI();
-
-// Canvas
 const canvas = document.querySelector("canvas.webgl");
-
-// Scene
 const scene = new THREE.Scene();
 
-/**
- * Models
- */
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/draco/");
 
@@ -29,8 +15,40 @@ const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
 
 let mixer = null;
-let objectDistance = 3.5;
 let objects = [];
+
+const canvas2 = document.createElement("canvas");
+canvas2.width = 512;
+canvas2.height = 128;
+const ctx = canvas2.getContext("2d");
+
+const countdownTexture = new THREE.CanvasTexture(canvas2);
+countdownTexture.needsUpdate = true;
+
+const countdownMaterial = new THREE.MeshBasicMaterial({ map: countdownTexture, transparent:true,color:"red" });
+const countdownGeometry = new THREE.PlaneGeometry(2, 0.5);
+const countdownMesh = new THREE.Mesh(countdownGeometry, countdownMaterial);
+
+countdownMesh.position.set(0, 2.2, -0.99);
+scene.add(countdownMesh);
+
+// Créez une fonction pour mettre à jour la texture du compteur
+function updateCountdownTexture() {
+  const hours = document.querySelector('.hours').textContent;
+  const minutes = document.querySelector('.minutes').textContent;
+  const seconds = document.querySelector('.seconds').textContent;
+  ctx.clearRect(0, 0, canvas2.width, canvas2.height);
+  ctx.font = "bold 50px Helvetica";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(`${hours} : ${minutes} : ${seconds}`, canvas2.width / 2, canvas2.height / 2);
+  countdownTexture.needsUpdate = true;
+}
+
+// Appelez la fonction pour mettre à jour la texture à chaque seconde
+setInterval(updateCountdownTexture, 1000);
+
 
 function loadModel(url, onProgressCallback) {
   return new Promise((resolve, reject) => {
@@ -43,9 +61,9 @@ function loadModel(url, onProgressCallback) {
   });
 }
 
+
 async function loadModels() {
   try {
-    // Chargez le modèle avec le GLTFLoader et suivez le chargement
     const canap = await loadModel("/models/room.glb", (xhr) => {
       const percentage = (xhr.loaded / xhr.total) * 100;
       updateLoadingProgress(percentage);
@@ -56,9 +74,6 @@ async function loadModels() {
     objects.push(canap.scene);
     scene.add(canap.scene);
 
-    // Mettre à jour la barre de chargement à 100% une fois que tout est chargé
-    updateLoadingProgress(100);
-    // Afficher la scène une fois que tout est chargé
     scene.visible = true;
   } catch (error) {
     console.error("Error loading models:", error);
@@ -75,56 +90,36 @@ const walls = new THREE.Mesh(
 );
 
 floor.rotation.x = -Math.PI / 2;
-walls.position.z = -3;
+walls.position.z = -1;
 scene.add(floor);
 scene.add(walls);
 
-// Call loadModels to initiate the loading process
 loadModels();
 
-/**
- * Floor
- */
-
-/**
- * Lights
- */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
 const light = new THREE.PointLight(0xffffff, 1, 100);
 light.position.set(0, 2, 1);
-light.castShadow = true; // Activer les ombres pour la lumière
-light.shadow.mapSize.width = 1024; // Largeur de la carte d'ombre
-light.shadow.mapSize.height = 1024; // Hauteur de la carte d'ombre
+light.castShadow = true; 
+light.shadow.mapSize.width = 1024;
+light.shadow.mapSize.height = 1024;
 scene.add(light);
 
-/**
- * Sizes
- */
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
 
 window.addEventListener("resize", () => {
-  // Update sizes
   sizes.width = window.innerWidth;
   sizes.height = window.innerHeight;
-
-  // Update camera
   camera.aspect = sizes.width / sizes.height;
   camera.updateProjectionMatrix();
-
-  // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-/**
- * Camera
- */
-// Base camera
 const cameraFinalPosition = new THREE.Vector3(0, 0.3, 2);
 
 const cameraDefaultPosition = new THREE.Vector3(0, 1, 10);
@@ -204,8 +199,6 @@ const video = document.querySelector(".video__wrapper")
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
-
-  // Mise à jour de la position de la caméra en fonction du scroll
   const scrollPercentage = scrollY / (document.body.scrollHeight - window.innerHeight);
   const lerpedPosition = new THREE.Vector3().lerpVectors(cameraDefaultPosition, cameraFinalPosition, scrollPercentage);
   camera.position.copy(lerpedPosition);
@@ -214,8 +207,6 @@ const tick = () => {
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
 
-  console.log(lerpedPosition, "LERPED", cameraFinalPosition, "FINAL" )
-  console.log(lerpedPosition.z, cameraFinalPosition.z + 0.1)
   if(lerpedPosition.z <= (cameraFinalPosition.z + 0.03) ){
     video.style.display = "block"
   }else{
