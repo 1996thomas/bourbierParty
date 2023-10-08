@@ -52,6 +52,7 @@ async function loadModels() {
     });
 
     canap.scene.position.z = 0;
+    canap.scene.position.x = -0.0051
     objects.push(canap.scene);
     scene.add(canap.scene);
 
@@ -214,7 +215,8 @@ const tick = () => {
   previousTime = elapsedTime;
 
   console.log(lerpedPosition, "LERPED", cameraFinalPosition, "FINAL" )
-  if(lerpedPosition.z === cameraFinalPosition.z){
+  console.log(lerpedPosition.z, cameraFinalPosition.z + 0.1)
+  if(lerpedPosition.z <= (cameraFinalPosition.z + 0.03) ){
     video.style.display = "block"
   }else{
     video.style.display = "none"
