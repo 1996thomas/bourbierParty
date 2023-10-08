@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import * as dat from "lil-gui";
+import { lerp } from "three/src/math/MathUtils";
 
 THREE.ColorManagement.enabled = false;
 
@@ -166,8 +167,8 @@ const loadingBar = document.querySelector(".loading-bar");
 const loadingProgress = document.querySelector(".loading-progress");
 
 function updateLoadingProgress(progress) {
-  loadingProgress.innerHTML =` ${Math.floor(progress)} %`
-}
+  const limitedProgress = Math.min(100, progress);
+  loadingProgress.innerHTML = ` ${Math.floor(limitedProgress)} %`;}
 
 /**
  * Animate
@@ -191,13 +192,14 @@ function simulateLoading() {
       loadingWrapper.classList.add("loading-complete");
       setTimeout(() => {
         loadingWrapper.style.display = "none"
-      }, 200);
+      }, 500);
     }
   }, 40); // Intervalle de mise à jour de la barre de chargement (en millisecondes)
 }
 
-
 simulateLoading();
+
+const video = document.querySelector(".video__wrapper")
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
@@ -211,6 +213,12 @@ const tick = () => {
   const deltaTime = elapsedTime - previousTime;
   previousTime = elapsedTime;
 
+  console.log(lerpedPosition, "LERPED", cameraFinalPosition, "FINAL" )
+  if(lerpedPosition.z === cameraFinalPosition.z){
+    video.style.display = "block"
+  }else{
+    video.style.display = "none"
+  }
   if (mixer) {
     mixer.update(deltaTime);
   }
