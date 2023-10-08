@@ -71,7 +71,7 @@ loadModels();
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+const ambientLight = new THREE.AmbientLight(0xffffff, .5);
 scene.add(ambientLight);
 
 const light = new THREE.PointLight(0xFFFFFF, 1, 100);
@@ -107,14 +107,14 @@ window.addEventListener("resize", () => {
  * Camera
  */
 // Base camera
-const cameraFinalPosition = new THREE.Vector3(0, 0.6, 1.7); // Position par défaut de la caméra
+const cameraFinalPosition = new THREE.Vector3(0, 0.3, 2);
 
-const cameraDefaultPosition = new THREE.Vector3(0, 1, 10); // Position finale souhaitée
+const cameraDefaultPosition = new THREE.Vector3(0, 1, 10);
 
-cameraDefaultPosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), - Math.PI / 6); 
+cameraDefaultPosition.applyAxisAngle(new THREE.Vector3(1, 0, 0), - Math.PI / 10); 
 
 const camera = new THREE.PerspectiveCamera(
-  50,
+  35,
   sizes.width / sizes.height,
   0.1,
   100
@@ -173,14 +173,14 @@ const tick = () => {
   // Update controls
   //controls.update();
 
-  console.log(camera.rotation)
-  console.log(camera.position)
 
   // Render
   renderer.render(scene, camera);
+  
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
 };
 
 tick();
+
